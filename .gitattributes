@@ -1,0 +1,5 @@
+# Userscript dosyalari LF ile saklanir; Tampermonkey/Greasy Fork CRLF ile de
+# calisir ama diff gurultusunu onlemek icin normalize ediyoruz.
+* text=auto eol=lf
+*.user.js text eol=lf
+*.md text eol=lf
