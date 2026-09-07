@@ -2,7 +2,7 @@
 // @name         Paste Clipboard as File (Claude + Gemini)
 // @name:tr      Panoyu Dosya Olarak Yapıştır (Claude + Gemini)
 // @namespace    https://serdarvural.dev/userscripts
-// @version      3.1.0
+// @version      3.1.1
 // @description  Attach the clipboard text to Claude or Gemini as a .txt file with one click (or Alt+Shift+V), instead of pasting a wall of text into the prompt box.
 // @description:tr Panodaki metni tek tıkla (veya Alt+Shift+V ile) .txt dosyası olarak Claude ve Gemini sohbet kutusuna ekler; uzun metni prompt kutusuna yapıştırmak zorunda kalmazsınız.
 // @author       Serdar Vural
@@ -64,6 +64,7 @@
   const ATTACH_POLL_MS = 100;    // "dosya kartı geldi mi" kontrol aralığı
   const ATTACH_TIMEOUT_MS = 3000; // bu süre içinde gelmezse diğer yöntem denenir
   const SWEEP_MS = 2000;         // MutationObserver'ın kaçırdığı SPA render'ları için emniyet taraması
+  const MUTATION_THROTTLE_MS = 200; // streaming sırasında her karede layout ölçmemek için
 
   // ------------------------------------------------------------------
   // Site tanımları
@@ -175,12 +176,14 @@
     return `clipboard_${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}-${p(d.getSeconds())}.txt`;
   }
 
-  function buildTransfer(text) {
-    const file = new File([text], makeFileName(), { type: 'text/plain' });
+  function buildTransfer(text, fileName) {
+    const file = new File([text], fileName, { type: 'text/plain' });
     const dt = new DataTransfer();
     dt.items.add(file);
     return dt;
   }
+
+  const nextFrame = () => new Promise((r) => requestAnimationFrame(r));
 
   function dispatchPaste(target, dt) {
     target.dispatchEvent(new ClipboardEvent('paste', {
@@ -199,11 +202,20 @@
   // Arayüz dosya kartını DOM'a ekleyene kadar bekler. Sabit bir gecikme yerine
   // yoklama yapıyoruz: yavaş makinede 800 ms yetmiyor ve hem paste hem drop
   // tetiklenip dosya iki kez ekleniyordu.
-  function waitForAttachment(area, countBefore) {
+  //
+  // İki sinyal var:
+  //   1) Dosya adı bölgede metin olarak belirdi (kesin sinyal; ad zaman
+  //      damgalı olduğu için sayfada başka yerde geçmez).
+  //   2) Bölgedeki eleman sayısı arttı (zayıf sinyal). Bölge document.body'ye
+  //      düşmüşse sayaç, streaming gibi alakasız mutasyonlar da sayımı
+  //      artırır; o durumda yalnızca 1. sinyale güveniliyor.
+  function waitForAttachment(area, countBefore, fileName) {
+    const strictOnly = area === document.body;
     return new Promise((resolve) => {
       const deadline = Date.now() + ATTACH_TIMEOUT_MS;
       const tick = () => {
-        if (area.getElementsByTagName('*').length > countBefore) return resolve(true);
+        if (area.textContent.includes(fileName)) return resolve(true);
+        if (!strictOnly && area.getElementsByTagName('*').length > countBefore) return resolve(true);
         if (Date.now() >= deadline) return resolve(false);
         setTimeout(tick, ATTACH_POLL_MS);
       };
@@ -241,23 +253,29 @@
     }
 
     const area = SITE.inputArea(editor);
-    const countBefore = area.getElementsByTagName('*').length;
+    const fileName = makeFileName();
 
     busy = true;
     try {
+      // Odaklanma editörün kendi re-render'ını tetikleyebilir (araç çubuğu,
+      // odak göstergesi vb.). Sayım bu render'dan sonra alınmalı ki eklenen
+      // elemanlar "dosya kartı geldi" sanılmasın. Re-render eşzamanlı
+      // olmadığı için bir kare bekleniyor.
       editor.focus();
+      await nextFrame();
+      const countBefore = area.getElementsByTagName('*').length;
 
       if (!forceDrop) {
-        dispatchPaste(editor, buildTransfer(text));
-        if (await waitForAttachment(area, countBefore)) {
+        dispatchPaste(editor, buildTransfer(text, fileName));
+        if (await waitForAttachment(area, countBefore, fileName)) {
           notify(T.attached);
           return;
         }
       }
 
       // Paste'i arayüz yakalamadıysa (veya Shift+tık ile zorlandıysa) drop ile dene
-      dispatchDrop(SITE.findDropTarget(editor), buildTransfer(text));
-      const ok = await waitForAttachment(area, countBefore);
+      dispatchDrop(SITE.findDropTarget(editor), buildTransfer(text, fileName));
+      const ok = await waitForAttachment(area, countBefore, fileName);
       notify(ok ? T.attachedDrop : T.failed, ok ? 'info' : 'error');
     } finally {
       busy = false;
@@ -304,6 +322,20 @@
     return btn;
   }
 
+  // Inline yerleşimi denenip butonun çizilemediği slot kabı. Aynı kap DOM'da
+  // durduğu sürece tekrar denenmez; yoksa yüzen buton her render'da silinip
+  // yeniden inline denenir, titrer ve tıklama kaçar. Site kabı yeniden
+  // oluşturursa (yeni eleman) deneme yeniden serbest kalır.
+  let failedSlotParent = null;
+
+  // Inline'a alınabilecek, görünür bir slot var mı?
+  function usableSlot(editor) {
+    const slot = SITE.findSlot(editor);
+    if (!slot || !isVisible(slot.parent)) return null;
+    if (failedSlotParent && failedSlotParent === slot.parent && failedSlotParent.isConnected) return null;
+    return slot;
+  }
+
   function ensureButton() {
     const editor = SITE.findEditor();
     if (!editor) return;
@@ -311,24 +343,30 @@
     // Buton yerinde ve görünürse dokunma. Her render'da yeniden yerleştirmek
     // butonun zıplamasına ve tıklamanın kaçmasına yol açıyor.
     const existing = document.getElementById(BUTTON_ID);
+    let slot = null;
     if (existing) {
-      const stillGood = existing.dataset.floating === '1'
-        ? existing.isConnected
-        : isVisible(existing) && isVisible(existing.parentElement);
-      if (stillGood) return;
+      if (existing.dataset.floating === '1') {
+        // Yüzen mod kalıcı değil: slot sonradan gelirse (SPA geçişi, geç
+        // render) inline'a geri dön.
+        slot = usableSlot(editor);
+        if (!slot) return;
+      } else if (isVisible(existing) && isVisible(existing.parentElement)) {
+        return;
+      }
       existing.remove();
     }
 
-    const slot = SITE.findSlot(editor);
+    if (!slot) slot = usableSlot(editor);
     const btn = createButton();
 
-    if (slot && isVisible(slot.parent)) {
+    if (slot) {
       const before = slot.before && slot.before.parentElement === slot.parent ? slot.before : null;
       styleInline(btn);
       slot.parent.insertBefore(btn, before);
-      // Kap görünür ama buton çizilemiyorsa (taşma/gizleme) yüzen moda düş
-      if (isVisible(btn)) return;
+      if (isVisible(btn)) { failedSlotParent = null; return; }
+      // Kap görünür ama buton çizilemiyor (taşma/gizleme): yüzen moda düş
       btn.remove();
+      failedSlotParent = slot.parent;
     }
 
     styleFloating(btn);
@@ -339,11 +377,22 @@
   // ------------------------------------------------------------------
   // Başlatma: MutationObserver + emniyet taraması (SPA yeniden render'ları)
   // ------------------------------------------------------------------
+  // Model cevap yazarken her token bir mutasyon; her karede ensureButton
+  // çalıştırmak getBoundingClientRect ile boşuna layout zorluyordu. Buton
+  // eksikse hemen, yerindeyse en fazla MUTATION_THROTTLE_MS'de bir bakılıyor.
   let scheduled = false;
+  let lastCheck = 0;
   const observer = new MutationObserver(() => {
     if (scheduled) return;
     scheduled = true;
-    requestAnimationFrame(() => { scheduled = false; ensureButton(); });
+    const btn = document.getElementById(BUTTON_ID);
+    const urgent = !btn || !btn.isConnected;
+    const wait = urgent ? 0 : Math.max(0, MUTATION_THROTTLE_MS - (Date.now() - lastCheck));
+    setTimeout(() => requestAnimationFrame(() => {
+      scheduled = false;
+      lastCheck = Date.now();
+      ensureButton();
+    }), wait);
   });
   observer.observe(document.body, { childList: true, subtree: true });
 

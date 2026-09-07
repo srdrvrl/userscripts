@@ -8,6 +8,25 @@ artmasıyla tetiklenir.
 
 ## paste-as-file
 
+### 3.1.1
+
+**Düzeltildi**
+- Buton bir kez yüzen moda düşünce, slot sonradan gelse bile (SPA geçişi,
+  geç render) inline konuma geri dönmüyordu. Artık slot görünür olunca inline'a
+  taşınıyor. Inline yerleşimin çizilemediği kap DOM'da durduğu sürece tekrar
+  denenmiyor; böylece buton iki mod arasında titremiyor.
+- "Dosya eklendi mi" sayımı odaklanmadan önce alınıyordu; editörün odak
+  re-render'ı eklediği elemanlar dosya kartı sanılabiliyordu. Sayım artık
+  odaklanıp bir kare bekledikten sonra alınıyor.
+- Gözlem bölgesi `document.body`'ye düştüğünde sayfadaki herhangi bir
+  mutasyon "eklendi" sayılıyordu. Artık öncelikle dosya adı (zaman damgalı,
+  eşsiz) bölgede aranıyor; body fallback'inde yalnızca bu sinyale güveniliyor.
+
+**Değişti**
+- Model cevap yazarken her token için `ensureButton` çalışıp layout zorluyordu.
+  Buton yerindeyse mutasyon kaynaklı kontrol en fazla 200 ms'de bir yapılıyor;
+  buton eksikse gecikmesiz.
+
 ### 3.1.0 - İlk Greasy Fork yayını
 
 İlk kişisel sürüm 3.0'dan yayına hazırlık farkları:
@@ -43,6 +62,19 @@ artmasıyla tetiklenir.
 ---
 
 ## sahibinden-ilan-kopyala
+
+### 1.2.1
+
+**Düzeltildi**
+- Boya / değişen tablosu hiç girilmemiş ilanlarda çıktı "hatasız" diyordu.
+  Satıcılar bu alanı bilerek veya bilmeyerek boş bırakabiliyor; boş tablo
+  hatasız araç demek değil. Markdown'da artık "bilgi girilmemiş, satıcıya
+  sorulmalı" notu, JSON'da `bodywork.declared: false` ve `bodywork.note`
+  alanı çıkıyor. Tüm parçalar orijinal işaretliyse de bunun satıcı beyanı
+  olduğu belirtiliyor.
+- URL'den ilan no türeten yedek regex `/detay` ile biten sayfa yollarıyla
+  eşleşmiyordu; `#classifiedId` bulunmayınca ilan no ve dosya adı boş
+  kalıyordu.
 
 ### 1.2.0 - İlk Greasy Fork yayını
 

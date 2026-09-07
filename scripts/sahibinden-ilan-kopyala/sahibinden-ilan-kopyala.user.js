@@ -2,7 +2,7 @@
 // @name         Sahibinden İlan Kopyala (AI için)
 // @name:en      Sahibinden Listing Copier (for AI)
 // @namespace    https://serdarvural.dev/userscripts
-// @version      1.2.0
+// @version      1.2.1
 // @description  Araç ilanının künyesini, boya/değişen durumunu (sağlam parçalar dahil), donanımını ve açıklamasını tek tıkla Markdown veya JSON olarak panoya kopyalar; ChatGPT/Claude/Gemini'ye yapıştırıp ilan yorumlatmak için.
 // @description:en Copies a sahibinden.com car listing (specs, paint/replaced panels, features, description) to the clipboard as Markdown or JSON, ready to paste into ChatGPT, Claude or Gemini.
 // @author       Serdar Vural
@@ -126,7 +126,8 @@
       title: txt(document.querySelector('.classifiedDetailTitle h1')),
       id: (document.getElementById('classifiedId')?.dataset.classifiedid ||
            txt(document.getElementById('classifiedId')) ||
-           (location.pathname.match(/-(\d+)\/?(?:\?|$)/) || [])[1] || ''),
+           // URL: /ilan/<slug>-<ilanNo>/detay ; ilan no slug'ın son parçası
+           (location.pathname.match(/-(\d+)(?:\/|$)/) || [])[1] || ''),
       price: txt(document.querySelector('.classified-price-wrapper')) ||
              (document.getElementById('favoriteClassifiedPrice')?.value || '').trim(),
       location: Array.from(document.querySelectorAll('.classifiedInfo h2 a')).map(txt).filter(Boolean).join(' / '),
@@ -240,8 +241,13 @@
     const problem = partEntries.filter(([, s]) => s !== 'Orijinal');
     const intact = partEntries.filter(([, s]) => s === 'Orijinal');
 
-    if (!problem.length) {
-      L.push('- Boyalı veya değişen parça işaretlenmemiş (hatasız).');
+    // Ekspertiz tablosu ilan sahibi tarafından girilir; boş bırakılması
+    // "hatasız" anlamına gelmez. Yapay zekaya kesin yargı sunmamak için
+    // iki durum ayrı ifade ediliyor.
+    if (!partEntries.length) {
+      L.push('- Boya / değişen bilgisi ilanda girilmemiş. Aracın hatasız olduğu anlamına gelmez; satıcıya sorulmalı veya ekspertizle doğrulanmalı.');
+    } else if (!problem.length) {
+      L.push('- Satıcı tüm parçaları orijinal olarak işaretlemiş (satıcı beyanı, ekspertizle doğrulanmalı).');
     } else {
       const grouped = {};
       problem.forEach(([p, s]) => (grouped[s] = grouped[s] || []).push(p));
@@ -291,6 +297,11 @@
 
   function toJSON(d, opts) {
     const out = JSON.parse(JSON.stringify(d));
+    // Boş parça listesi "hatasız" diye okunmasın; durumu açıkça belirt
+    out.bodywork.declared = Object.keys(out.bodywork.parts).length > 0;
+    if (!out.bodywork.declared) {
+      out.bodywork.note = 'Boya / değişen bilgisi ilanda girilmemiş; hatasız anlamına gelmez.';
+    }
     if (!opts.includeIntact) {
       out.bodywork.parts = Object.fromEntries(
         Object.entries(out.bodywork.parts).filter(([, s]) => s !== 'Orijinal')
