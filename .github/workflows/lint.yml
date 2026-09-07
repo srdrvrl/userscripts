@@ -1,0 +1,50 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Sözdizimi kontrolü
+        run: |
+          shopt -s globstar nullglob
+          files=(scripts/**/*.user.js)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::scripts/ altında .user.js bulunamadı"
+            exit 1
+          fi
+          for f in "${files[@]}"; do
+            echo "→ $f"
+            node --check "$f"
+          done
+
+      - name: Userscript başlığı kontrolü
+        run: |
+          shopt -s globstar nullglob
+          status=0
+          for f in scripts/**/*.user.js; do
+            for key in '@name' '@namespace' '@version' '@description' '@author' '@license' '@match'; do
+              grep -q "^// ${key}[[:space:]]" "$f" \
+                || { echo "::error file=$f::${key} eksik"; status=1; }
+            done
+            # Greasy Fork bu ikisini kendisi yönetir, elle eklenmiş olmamalı
+            for key in '@downloadURL' '@updateURL'; do
+              grep -q "^// ${key}[[:space:]]" "$f" \
+                && { echo "::error file=$f::${key} kaldırılmalı"; status=1; }
+            done
+          done
+          exit $status

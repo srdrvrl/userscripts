@@ -26,6 +26,16 @@ artmasıyla tetiklenir.
 - Arayüz iki dilli (Türkçe / İngilizce), tarayıcı diline göre seçiliyor.
 - `@license MIT`, gerçek `@namespace`, `@homepageURL`, `@icon`, `@noframes`.
 
+- Paste'in tutup tutmadığı sabit 800 ms sonra tek sefer kontrol ediliyordu.
+  Yavaş makinede veya arayüz takıldığında dosya kartı bu süreden geç geliyor,
+  paste tutmuş olmasına rağmen drop da tetikleniyor ve dosya iki kez
+  ekleniyordu. Artık 3 sn boyunca yoklanıyor, yalnızca gerçekten gelmediyse
+  drop deneniyor.
+- Ekleme başarısız olsa bile "eklendi" bildirimi gösteriliyordu; artık iki
+  yöntem de tutmazsa hata bildirimi çıkıyor.
+- Kısayola basılı tutmak veya butona üst üste tıklamak birden fazla dosya
+  ekleyebiliyordu; eşzamanlı çalışma engellendi.
+
 **Değişti**
 - Emniyet taraması sekme arka plandayken duruyor (1,5 sn → 2 sn; gizliyken hiç).
 - Yayın sürümünden konsol çıktısı kaldırıldı.

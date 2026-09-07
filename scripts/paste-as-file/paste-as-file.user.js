@@ -37,6 +37,8 @@
       empty: 'Clipboard is empty.',
       attached: 'Attached as a file.',
       attachedDrop: 'Attached as a file (drop method).',
+      failed: 'Could not attach the file. Try dragging a .txt file instead.',
+      busy: 'Still working on the previous attachment…',
     },
     tr: {
       label: '📄 Dosya Yapıştır',
@@ -47,6 +49,8 @@
       empty: 'Pano boş.',
       attached: 'Dosya olarak eklendi.',
       attachedDrop: 'Dosya olarak eklendi (drop yöntemi).',
+      failed: 'Dosya eklenemedi. Bir .txt dosyasını elle sürükleyip bırakmayı deneyin.',
+      busy: 'Önceki ekleme henüz sürüyor…',
     },
   };
   const T = STRINGS[(navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en'];
@@ -56,7 +60,8 @@
   // ------------------------------------------------------------------
   const BUTTON_ID = 'paste-as-file-btn';
   const SHORTCUT = { altKey: true, shiftKey: true, key: 'v' }; // Alt+Shift+V
-  const FALLBACK_DELAY_MS = 800; // paste sonrası dosya eklenmediyse drop denemesi için bekleme
+  const ATTACH_POLL_MS = 100;    // "dosya kartı geldi mi" kontrol aralığı
+  const ATTACH_TIMEOUT_MS = 3000; // bu süre içinde gelmezse diğer yöntem denenir
   const SWEEP_MS = 2000;         // MutationObserver'ın kaçırdığı SPA render'ları için emniyet taraması
 
   // ------------------------------------------------------------------
@@ -190,7 +195,30 @@
     }
   }
 
+  // Arayüz dosya kartını DOM'a ekleyene kadar bekler. Sabit bir gecikme yerine
+  // yoklama yapıyoruz: yavaş makinede 800 ms yetmiyor ve hem paste hem drop
+  // tetiklenip dosya iki kez ekleniyordu.
+  function waitForAttachment(area, countBefore) {
+    return new Promise((resolve) => {
+      const deadline = Date.now() + ATTACH_TIMEOUT_MS;
+      const tick = () => {
+        if (area.getElementsByTagName('*').length > countBefore) return resolve(true);
+        if (Date.now() >= deadline) return resolve(false);
+        setTimeout(tick, ATTACH_POLL_MS);
+      };
+      setTimeout(tick, ATTACH_POLL_MS);
+    });
+  }
+
+  let busy = false;
+
   async function pasteAsFile({ forceDrop = false } = {}) {
+    // Kısayola basılı tutmak veya butona üst üste tıklamak iki dosya eklemesin
+    if (busy) {
+      notify(T.busy, 'error');
+      return;
+    }
+
     const editor = SITE.findEditor();
     if (!editor) {
       notify(T.noEditor, 'error');
@@ -214,25 +242,25 @@
     const area = SITE.inputArea(editor);
     const countBefore = area.getElementsByTagName('*').length;
 
-    editor.focus();
+    busy = true;
+    try {
+      editor.focus();
 
-    if (forceDrop) {
-      dispatchDrop(SITE.findDropTarget(editor), buildTransfer(text));
-      notify(T.attachedDrop);
-      return;
-    }
-
-    dispatchPaste(editor, buildTransfer(text));
-
-    // Paste'i arayüz yakalamadıysa (DOM'a dosya kartı eklenmediyse) drop ile dene
-    setTimeout(() => {
-      if (area.getElementsByTagName('*').length > countBefore) {
-        notify(T.attached);
-      } else {
-        dispatchDrop(SITE.findDropTarget(editor), buildTransfer(text));
-        notify(T.attachedDrop);
+      if (!forceDrop) {
+        dispatchPaste(editor, buildTransfer(text));
+        if (await waitForAttachment(area, countBefore)) {
+          notify(T.attached);
+          return;
+        }
       }
-    }, FALLBACK_DELAY_MS);
+
+      // Paste'i arayüz yakalamadıysa (veya Shift+tık ile zorlandıysa) drop ile dene
+      dispatchDrop(SITE.findDropTarget(editor), buildTransfer(text));
+      const ok = await waitForAttachment(area, countBefore);
+      notify(ok ? T.attachedDrop : T.failed, ok ? 'info' : 'error');
+    } finally {
+      busy = false;
+    }
   }
 
   // ------------------------------------------------------------------
