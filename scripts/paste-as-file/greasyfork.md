@@ -26,7 +26,7 @@ dumping it into the prompt.
 
 **Notes**
 
-* The first use may ask for clipboard permission — that is the browser's own
+* The first use may ask for clipboard permission; that is the browser's own
   prompt, the script only calls `navigator.clipboard.readText()`.
 * No network requests, no tracking, no external dependencies. Everything happens
   in your tab.

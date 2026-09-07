@@ -18,9 +18,9 @@ diyebilirsiniz.
 
 * Başlık, fiyat, konum, ilan no, link, varsa fiyat değişim tarihçesi
 * Künye (marka, model, yıl, km, vites, yakıt, kimden, takas, EİDS izni…)
-* **Boya / değişen durumu** — grafikteki her parça tek tek okunur; sağlam
+* **Boya / değişen durumu**: grafikteki her parça tek tek okunur; sağlam
   parçaları listelemek isteğe bağlıdır
-* Donanım listesi — istenirse "olmayan" donanımlar da **YOK** olarak yazılır
+* Donanım listesi: istenirse "olmayan" donanımlar da **YOK** olarak yazılır
   (yapay zekânın eksik donanımı uydurmasını engeller)
 * Satıcı adı ve hesap açma tarihi (isteğe bağlı)
 * İlan açıklaması (isteğe bağlı)
@@ -51,9 +51,9 @@ MIT lisanslı. [Serdar Vural](https://serdarvural.dev) tarafından yazıldı.
 ## English
 
 Turkish-only site. This script adds a **"Copy listing"** panel to a
-sahibinden.com car listing page and copies the useful part of the page —
-specs, paint/replaced panel status per body part, features, seller info and the
-description — to your clipboard as clean **Markdown** or **JSON**, ready to paste
+sahibinden.com car listing page and copies the useful part of the page (specs,
+paint/replaced panel status per body part, features, seller info and the
+description) to your clipboard as clean **Markdown** or **JSON**, ready to paste
 into ChatGPT, Claude or Gemini for an assessment.
 
 Options (include intact panels, mark missing features as "not present", include
@@ -68,7 +68,7 @@ number.
 sahibinden.com. It formats data that is already open in the user's own browser
 for personal use; it does no bulk scraping and sends no data to any external
 server. Page content remains the property of the listing owner and
-sahibinden.com — complying with that site's terms of use is your responsibility.
+sahibinden.com; complying with that site's terms of use is your responsibility.
 
 MIT licensed. Written by [Serdar Vural](https://serdarvural.dev).
 

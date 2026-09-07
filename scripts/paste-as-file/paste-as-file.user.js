@@ -18,7 +18,7 @@
 // ==/UserScript==
 
 /*
- * Paste Clipboard as File — https://serdarvural.dev
+ * Paste Clipboard as File - https://serdarvural.dev
  * MIT License. Copyright (c) 2025 Serdar Vural.
  */
 
@@ -86,7 +86,7 @@
       findSlot: (editor) => {
         const scope = (editor && editor.closest('fieldset, form')) || document;
 
-        // 1) Ek dosya / "+" menüsü — metin girilsin girilmesin hep durur
+        // 1) Ek dosya / "+" menüsü: metin girilsin girilmesin hep durur
         const anchor =
           scope.querySelector('[data-testid="input-menu-plus"]') ||
           scope.querySelector('button[aria-label*="attach" i]') ||

@@ -8,7 +8,7 @@ artmasıyla tetiklenir.
 
 ## paste-as-file
 
-### 3.1.0 — İlk Greasy Fork yayını
+### 3.1.0 - İlk Greasy Fork yayını
 
 İlk kişisel sürüm 3.0'dan yayına hazırlık farkları:
 
@@ -44,7 +44,7 @@ artmasıyla tetiklenir.
 
 ## sahibinden-ilan-kopyala
 
-### 1.2.0 — İlk Greasy Fork yayını
+### 1.2.0 - İlk Greasy Fork yayını
 
 İlk kişisel sürüm 1.1.1'den yayına hazırlık farkları:
 

@@ -3,7 +3,7 @@
 // @name:en      Sahibinden Listing Copier (for AI)
 // @namespace    https://serdarvural.dev/userscripts
 // @version      1.2.0
-// @description  Araç ilanının künyesini, boya/değişen durumunu (sağlam parçalar dahil), donanımını ve açıklamasını tek tıkla Markdown veya JSON olarak panoya kopyalar — ChatGPT/Claude/Gemini'ye yapıştırıp ilan yorumlatmak için.
+// @description  Araç ilanının künyesini, boya/değişen durumunu (sağlam parçalar dahil), donanımını ve açıklamasını tek tıkla Markdown veya JSON olarak panoya kopyalar; ChatGPT/Claude/Gemini'ye yapıştırıp ilan yorumlatmak için.
 // @description:en Copies a sahibinden.com car listing (specs, paint/replaced panels, features, description) to the clipboard as Markdown or JSON, ready to paste into ChatGPT, Claude or Gemini.
 // @author       Serdar Vural
 // @homepageURL  https://github.com/srdrvrl/userscripts
@@ -20,7 +20,7 @@
 // ==/UserScript==
 
 /*
- * Sahibinden İlan Kopyala — https://serdarvural.dev
+ * Sahibinden İlan Kopyala - https://serdarvural.dev
  * MIT License. Copyright (c) 2025 Serdar Vural.
  *
  * SORUMLULUK REDDİ
@@ -480,7 +480,7 @@
   let panel = null;
 
   // Dönüş: panel nihai konumuna yerleşti mi? İletişim kutusu sayfaya geç
-  // geliyorsa panel önce en alta konur, kutu belirince yukarı taşınır —
+  // geliyorsa panel önce en alta konur, kutu belirince yukarı taşınır;
   // konumu yükleme hızına göre oynamasın diye.
   function mount() {
     const container = document.querySelector(CONTAINER_SEL);
