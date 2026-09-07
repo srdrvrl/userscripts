@@ -6,7 +6,8 @@
 // @description  Attach the clipboard text to Claude or Gemini as a .txt file with one click (or Alt+Shift+V), instead of pasting a wall of text into the prompt box.
 // @description:tr Panodaki metni tek tıkla (veya Alt+Shift+V ile) .txt dosyası olarak Claude ve Gemini sohbet kutusuna ekler; uzun metni prompt kutusuna yapıştırmak zorunda kalmazsınız.
 // @author       Serdar Vural
-// @homepageURL  https://serdarvural.dev
+// @homepageURL  https://github.com/srdrvrl/userscripts
+// @supportURL   https://github.com/srdrvrl/userscripts/issues
 // @license      MIT
 // @icon         data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Crect%20width%3D%2724%27%20height%3D%2724%27%20rx%3D%275%27%20fill%3D%27%231e8e3e%27/%3E%3Cpath%20d%3D%27M8%205.5h5.2L17%209.3V18a1.2%201.2%200%200%201-1.2%201.2H8A1.2%201.2%200%200%201%206.8%2018V6.7A1.2%201.2%200%200%201%208%205.5z%27%20fill%3D%27%23fff%27/%3E%3Cpath%20d%3D%27M9.2%2012h5.4M9.2%2014.4h5.4M9.2%2016.8h3.2%27%20stroke%3D%27%231e8e3e%27%20stroke-width%3D%271.2%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E
 // @match        *://claude.ai/*

@@ -71,3 +71,8 @@ server. Page content remains the property of the listing owner and
 sahibinden.com — complying with that site's terms of use is your responsibility.
 
 MIT licensed. Written by [Serdar Vural](https://serdarvural.dev).
+
+---
+
+**Kaynak kod / Source:** <https://github.com/srdrvrl/userscripts>
+**Hata bildirimi / Issues:** <https://github.com/srdrvrl/userscripts/issues>

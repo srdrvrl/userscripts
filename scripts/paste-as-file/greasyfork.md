@@ -63,3 +63,8 @@ tıkla panodaki metni prompt'a yapıştırmak yerine `.txt` dosyası olarak ekle
 * Arayüz tarayıcı dilinize göre Türkçe veya İngilizce gelir.
 
 MIT lisanslı. [Serdar Vural](https://serdarvural.dev) tarafından yazıldı.
+
+---
+
+**Kaynak kod / Source:** <https://github.com/srdrvrl/userscripts>
+**Hata bildirimi / Issues:** <https://github.com/srdrvrl/userscripts/issues>

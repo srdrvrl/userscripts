@@ -8,20 +8,33 @@ tamamı açtığınız sayfanın içinde, sizin tıklamanızla çalışır.
 
 ## Scriptler
 
-| Script | Ne yapar | Çalıştığı site |
-|---|---|---|
-| [**paste-as-file**](scripts/paste-as-file/) | Panodaki metni prompt kutusuna yapıştırmak yerine `.txt` dosyası olarak ekler | claude.ai, gemini.google.com |
-| [**sahibinden-ilan-kopyala**](scripts/sahibinden-ilan-kopyala/) | Araç ilanını Markdown/JSON olarak panoya kopyalar — yapay zekâya yorumlatmak için | sahibinden.com |
+### 📄 [paste-as-file](scripts/paste-as-file/)
 
-Her scriptin ayrıntılı açıklaması kendi klasöründeki `greasyfork.md` dosyasında.
+Panodaki uzun metni prompt kutusuna yapıştırmak yerine `.txt` dosyası olarak
+ekler. Claude ve Gemini uzun metni ek dosya olarak daha iyi işliyor, sohbet de
+okunaklı kalıyor. Tek tık veya <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd>.
+
+`claude.ai` · `gemini.google.com` — [kur](GREASYFORK_PASTE_AS_FILE) ·
+[açıklama](scripts/paste-as-file/greasyfork.md)
+
+### 🚗 [sahibinden-ilan-kopyala](scripts/sahibinden-ilan-kopyala/)
+
+Araç ilanının künyesini, boya/değişen durumunu (grafikteki her parça tek tek),
+donanımını ve açıklamasını temiz Markdown veya JSON olarak panoya kopyalar.
+ChatGPT/Claude/Gemini'ye yapıştırıp ilan yorumlatmak için.
+
+`sahibinden.com` — [kur](GREASYFORK_SAHIBINDEN) ·
+[açıklama](scripts/sahibinden-ilan-kopyala/greasyfork.md)
 
 ## Kurulum
 
 1. [Tampermonkey](https://www.tampermonkey.net/) veya
    [Violentmonkey](https://violentmonkey.github.io/) kurun.
-2. İstediğiniz `.user.js` dosyasını açın → eklenti kurulum ekranını gösterir.
+2. Yukarıdaki **kur** bağlantısına tıklayın.
 
-Greasy Fork üzerinden kurarsanız güncellemeler otomatik gelir.
+Greasy Fork üzerinden kurarsanız güncellemeler otomatik gelir. Depodaki
+`.user.js` dosyasını doğrudan açarak da kurabilirsiniz, o durumda güncellemeleri
+elle almanız gerekir.
 
 ## Gizlilik
 

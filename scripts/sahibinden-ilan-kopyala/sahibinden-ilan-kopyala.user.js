@@ -6,7 +6,8 @@
 // @description  Araç ilanının künyesini, boya/değişen durumunu (sağlam parçalar dahil), donanımını ve açıklamasını tek tıkla Markdown veya JSON olarak panoya kopyalar — ChatGPT/Claude/Gemini'ye yapıştırıp ilan yorumlatmak için.
 // @description:en Copies a sahibinden.com car listing (specs, paint/replaced panels, features, description) to the clipboard as Markdown or JSON, ready to paste into ChatGPT, Claude or Gemini.
 // @author       Serdar Vural
-// @homepageURL  https://serdarvural.dev
+// @homepageURL  https://github.com/srdrvrl/userscripts
+// @supportURL   https://github.com/srdrvrl/userscripts/issues
 // @license      MIT
 // @icon         data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Crect%20width%3D%2724%27%20height%3D%2724%27%20rx%3D%275%27%20fill%3D%27%23ffe800%27/%3E%3Cpath%20d%3D%27M4.5%2014.2l1.4-4a2%202%200%200%201%201.9-1.3h8.4a2%202%200%200%201%201.9%201.3l1.4%204v3.6h-2.3v-1.4H6.8v1.4H4.5z%27%20fill%3D%27%23222%27/%3E%3Ccircle%20cx%3D%277.6%27%20cy%3D%2714.6%27%20r%3D%271%27%20fill%3D%27%23ffe800%27/%3E%3Ccircle%20cx%3D%2716.4%27%20cy%3D%2714.6%27%20r%3D%271%27%20fill%3D%27%23ffe800%27/%3E%3C/svg%3E
 // @match        https://www.sahibinden.com/ilan/*
